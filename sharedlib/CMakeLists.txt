@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.5)
 project(shared_lib)
 
 # Set build to release  
@@ -8,10 +8,18 @@ set(CMAKE_BUILD_TYPE Release)
 include_directories(include)
 
 # GLOB allow all files to be added
-file(GLOB SOURCES "src/*.cpp")
+# Bad habit 
+#file(GLOB SOURCES "src/*.cpp")
 
-#Generate the shared library from the sources
-add_library(thisLibrary SHARED ${SOURCES})
+# Generate the shared library from the sources
+# Declare module
+add_library(thisLibrary SHARED
+    src/file1.cpp
+    src/file2.cpp
+)
+
+# Declare flags
+target_include_directories(thisLibrary PUBLIC include)
 
 #Set the location for library installation -- i.e., /usr/lib in this case
 # not really necessary in this example. Use "sudo make install" to apply

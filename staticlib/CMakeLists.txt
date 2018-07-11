@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.5)
 project(static_lib)
 set(CMAKE_BUILD_TYPE Release)
  
@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE Release)
 include_directories(include)
  
 # GLOB allow all files to be added
-file(GLOB SOURCES "src/*.cpp")
+#file(GLOB SOURCES "src/*.cpp")
  
 # Generate the static library from the sources (NOTE THE DIFF: SHARED vs STATIC) 
 add_library(testStudent STATIC ${SOURCES})
