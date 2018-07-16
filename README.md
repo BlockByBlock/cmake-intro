@@ -8,6 +8,9 @@ It's time to do cmake right [Link](https://pabloariasal.github.io/2018/02/19/its
 
 Effective Modern CMake [Link](https://gist.github.com/mbinna/c61dbb39bca0e4fb7d1f73b0d66a4fd1)
 
+Modern CMake [Link](https://github.com/toeb/moderncmake)
+
+
 ### Targets and Properties - Pablo Arias
 
 Executable is target. Library is target. Source files are properties.
@@ -16,9 +19,21 @@ Executable is target. Library is target. Source files are properties.
 
   **INTERFACE** use by users of target e.g. executable using the library
 
+    e.g. target_compile_definitions(myTarget INTERFACE USE_MYTARGET)
+    
+    causes preprocessor definition USE_MYTARGET to be defined in all targets depending on myTarget but not in myTarget itself
+
   **PRIVATE** to build own target/implementation - not passed down
 
+    e.g. target_include_directories(myTarget PRIVATE ./src)
+
+    causes the directory ./src to be searched for include files only by myTarget
+
   **PUBLIC** both interface and private
+
+    e.g. target_include_directories(myTarget PUBLIC ./include)
+
+    causes directory ./include to be searched for include files by myTarget and in all targets depending on it via target_link_libraries
 
 ### Dependencies
 
