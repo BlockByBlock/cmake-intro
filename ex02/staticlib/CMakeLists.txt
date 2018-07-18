@@ -13,13 +13,21 @@ target_include_directories(staticlib
 )
 
 # For testing only
-add_executable(sl_test
-    test/static_test.cpp
+add_executable(st_test test/static_test.cpp)
+target_link_libraries(st_test staticlib)
+add_test(st_test st_test)
+
+# Install target
+install(TARGETS staticlib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
 )
 
-target_link_libraries(sl_test
-    staticlib
+# Install public include
+install(FILES
+    include/static.h
+    DESTINATION include
 )
 
-add_test(sl_test sl_test)
+
 

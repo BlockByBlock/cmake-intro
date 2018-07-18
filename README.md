@@ -164,5 +164,22 @@ find_dependency(Bar 2.0)
 include("${CMAKE_CURRENT_LIST_DIR}/FooTargets.cmake")
 ```
 
+### Target Installation
+
+Could install targets, files, exports, directories
+
+ARCHIVE - Static Library
+LIBRARY - non-DLL platform shared library
+RUNTIME - Executables
+FRAMEWORK - OS-X shared library
+
+```
+install(TARGETS targets 
+	LIBRARY DESTINATION bin)
+
+install(FILES file.h 
+	LIBRARY DESTINATION include)
+```
+
 
 

@@ -5,6 +5,7 @@ project(ex02)
 enable_testing()
 
 add_subdirectory(staticlib)
+add_subdirectory(sharedlib)
 
 add_executable(main src/main.cpp)
-target_link_libraries(main staticlib)
+target_link_libraries(main staticlib sharedlib)
