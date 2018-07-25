@@ -20,7 +20,7 @@ Executable is target. Library is target. Source files are properties.
   **INTERFACE** use by users of target e.g. executable using the library
 
     e.g. target_compile_definitions(myTarget INTERFACE USE_MYTARGET)
-    
+
     causes preprocessor definition USE_MYTARGET to be defined in all targets depending on myTarget but not in myTarget itself
 
   **PRIVATE** to build own target/implementation - not passed down
@@ -35,17 +35,13 @@ Executable is target. Library is target. Source files are properties.
 
     causes directory ./include to be searched for include files by myTarget and in all targets depending on it via target_link_libraries
 
-### Dependencies
 
-```
-target_link_libraries(example
-    PUBLIC
-        Shared_class
-    PRIVATE
-        Internal_class
-```
 
-### External Modules
+------
+
+### Examples
+
+##### External Modules
 
 ```
 find_package(ExtMod)
@@ -62,7 +58,9 @@ target_link_libraries(Main
 
 ```
 
-### External Library
+
+
+##### External Library
 
 ```
 find_library(BAR_LIB bar HINTS ${BAR_DIR}/lib)
@@ -74,7 +72,7 @@ set target_properties(bar PROPERTIES
               INTERFACE_LINK_LIBRARIES Boost::boost)
 ```
 
-* Example
+Example
 
 ```
 find_package(Bar 2.0 REQUIRED)
@@ -94,7 +92,9 @@ install(EXPORT FooTargets
   )
 ```
 
-### Third Part Dependencies - FindFoo.cmake - not built with cmake
+
+
+##### Third Part Dependencies - FindFoo.cmake - not built with cmake
 
 ```
 find_path(Foo_INCLUDE_DIR foo.h)
@@ -119,12 +119,10 @@ if(Foo_FOUND AND NOT TARFET Foo::Foo)
 endif()
 ```
 
-### Header-only libraries
-```
-add_library(thirdLib INTERFACE)
-target_include_directories(thirdLib INTERFACE include)
-target_link_libraries(thirdLib INTERFACE anotherLib)
-```
+------
+
+
+
 ### Random Stuff
 
 * Use Modern CMake (>3/0)
@@ -164,9 +162,39 @@ find_dependency(Bar 2.0)
 include("${CMAKE_CURRENT_LIST_DIR}/FooTargets.cmake")
 ```
 
-### Target Installation
+------
 
-Could install targets, files, exports, directories
+
+
+### Install vs Build
+
+Using application from build/install directory decide whether there is a need to install
+
+INSTALL is used to implement 'make install' and also packaging. If the software is used from source build, install can be ignored. However in a deployment perspective, installation will be preferred.
+
+Installing makes a software package generally available to users of the system, by installing its component into a well-known prefix (e.g. /usr, /opt). This way it is more convenient to use the installed binaries than in the build directory.
+
+If a project is installed, it is available system-wide. find_package() > target_link_libraries() - in case modules not installed in standard location.
+
+If a project is built, install should generate exports - so user do no need to find module, and will be built like part of the project that uses the targets
+
+
+
+##### Using EXPORT 
+
+Export command creates a build-directory for exported target files. 
+
+EXPORT(..) vs INSTALL(EXPORT ..)
+
+* EXPORT(..) for build trees
+
+* INSTALL(EXPORT ..) for install trees
+
+  
+
+##### INSTALL command
+
+The INSTALL command can install targets, files, exports, directories
 
 ARCHIVE - Static Library
 LIBRARY - non-DLL platform shared library
