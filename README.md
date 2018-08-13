@@ -1,17 +1,8 @@
-# Intro to CMake
-
-### Reads
-
-Daniel Pfeifer's Effective CMake [Link](https://www.youtube.com/watch?v=bsXLMQ6WgIk)
-
-It's time to do cmake right [Link](https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/)
-
-Effective Modern CMake [Link](https://gist.github.com/mbinna/c61dbb39bca0e4fb7d1f73b0d66a4fd1)
-
-Modern CMake [Link](https://github.com/toeb/moderncmake)
+# Modern CMake
 
 
-### Targets and Properties - Pablo Arias
+
+### Targets and Properties 
 
 Executable is target. Library is target. Source files are properties.
 
@@ -41,62 +32,20 @@ Executable is target. Library is target. Source files are properties.
 
 ### Examples
 
-##### External Modules
+##### External Modules/Libraries
 
-```
+```cmake
 find_package(ExtMod)
 
-add_executable(Main ..)
-
-target_include_directories(Main
-    PRIVATE ${ExtMod_INCLUDE_DIRS}
-)
-
-target_link_libraries(Main
-     PRIVATE ${ExtMod_BOTH_LIBS}
-)
-
-```
-
-
-
-##### External Library
-
-```
-find_library(BAR_LIB bar HINTS ${BAR_DIR}/lib)
-add_library(bar SHARED IMPORTED)
-set_target_properties(bar PROPERTIES
-             LOCATION ${BAR_LIB})
-set target_properties(bar PROPERTIES
-              INTERFACE_INCLUDE_DIRECTORIES ${BAR_DIR}/include)
-              INTERFACE_LINK_LIBRARIES Boost::boost)
-```
-
-Example
-
-```
-find_package(Bar 2.0 REQUIRED)
-add _library(Foo ...)
-target_link_libraries(Foo PRIVATE Bar::Bar)
-
-install(TARGETS Foo EXPORT FooTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-  )
-install(EXPORT FooTargets
-  FILE FooTargets.cmake
-  NAMESPACE Foo::
-  DESTINATION lib/cmake/Foo
-  )
+target_include_directories(Main PRIVATE ${ExtMod_INCLUDE_DIRS})
+target_link_libraries(Main PRIVATE ${ExtMod_BOTH_LIBS})
 ```
 
 
 
 ##### Third Part Dependencies - FindFoo.cmake - not built with cmake
 
-```
+```cmake
 find_path(Foo_INCLUDE_DIR foo.h)
 find_library(Foo_LIBRARY foo)
 # Prevent appear on cache editor
@@ -123,58 +72,11 @@ endif()
 
 
 
-### Random Stuff
-
-* Use Modern CMake (>3/0)
-
-* Do not use CMAKE_CXX_FLAGS, diff on diff compilers, can't define properly
-
-* Don't use file(GLOB), cannot detect file changes well
-
-* Don't use include_directories, use target_include_directories (but not with a path outside module)
-
-* Don't use target_link_libraries without specifying public/private/interface
-
-* Forget add_compile_options(), link_directories(), link_libraries
-
-* Avoid variables = avoid empty space 
-
-* Export target not variables
-
-* Consider use of CMakePackageConfigHelps
-
-```
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file("FooConfigVersion.cmake"
-  VERSION ${Foo_VERSION}
-  COMPARIBILITY SameMajorVersion
-  )
-install(FILES "FooConfig.cmake" "FooConfigVersion.cmake"
-  DESTINATION lib/cmake/Foo
-)
-```
-
-* Consider use of CMakeFindDependencyMacro
-
-```
-include(CMakeFindDependencyMacro)
-find_dependency(Bar 2.0)
-include("${CMAKE_CURRENT_LIST_DIR}/FooTargets.cmake")
-```
-
-------
-
-
-
 ### Install vs Build
 
 Using application from build/install directory decide whether there is a need to install
 
-INSTALL is used to implement 'make install' and also packaging. If the software is used from source build, install can be ignored. However in a deployment perspective, installation will be preferred.
-
-Installing makes a software package generally available to users of the system, by installing its component into a well-known prefix (e.g. /usr, /opt). This way it is more convenient to use the installed binaries than in the build directory.
-
-If a project is installed, it is available system-wide. find_package() > target_link_libraries() - in case modules not installed in standard location.
+INSTALL is used to implement 'make install'. If the software is used from source build, install can be ignored. However in a deployment perspective, installation will be preferred. By installing component into a well-known prefix (e.g. /usr, /opt), it is available system-wide. 
 
 If a project is built, install should generate exports - so user do no need to find module, and will be built like part of the project that uses the targets
 
@@ -211,3 +113,41 @@ install(FILES file.h
 
 
 
+##### Install for directories
+
+```
+target_include_directories(target
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+```
+
+
+
+------
+
+
+
+### Random Stuff
+
+- Don't use file(GLOB), cannot detect file changes well
+- Don't use include_directories, use target_include_directories (but not with a path outside module)
+
+------
+
+
+
+### Reads
+
+Daniel Pfeifer's Effective CMake [Link](https://www.youtube.com/watch?v=bsXLMQ6WgIk)
+
+It's time to do cmake right [Link](https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/)
+
+Effective Modern CMake [Link](https://gist.github.com/mbinna/c61dbb39bca0e4fb7d1f73b0d66a4fd1)
+
+Modern CMake [Link](https://github.com/toeb/moderncmake)
+
+CMake-enabled libraries [Link](https://coderwall.com/p/qej45g/use-cmake-enabled-libraries-in-your-cmake-project-iii)
