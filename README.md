@@ -1,49 +1,103 @@
 # Modern CMake
 
+To understand modern cmake, here are few stuffs to consider
 
-
-### Targets and Properties 
-
-Executable is target. Library is target. Source files are properties.
-
-* Properties
-
-  **INTERFACE** use by users of target e.g. executable using the library
-
-    e.g. target_compile_definitions(myTarget INTERFACE USE_MYTARGET)
-
-    causes preprocessor definition USE_MYTARGET to be defined in all targets depending on myTarget but not in myTarget itself
-
-  **PRIVATE** to build own target/implementation - not passed down
-
-    e.g. target_include_directories(myTarget PRIVATE ./src)
-
-    causes the directory ./src to be searched for include files only by myTarget
-
-  **PUBLIC** both interface and private
-
-    e.g. target_include_directories(myTarget PUBLIC ./include)
-
-    causes directory ./include to be searched for include files by myTarget and in all targets depending on it via target_link_libraries
+* cmake_minimum_required >3
+* Target is how cmake work, **target target target**
+* Indicating the files to include e.g. set, add_library
+* Indicating where the files are located e.g. target_include_directories
+* Executable? add_executable
+* Any installation required? Local or system-wide
 
 
 
-------
 
-### Examples
 
-##### External Modules/Libraries
+## Targets  
+
+.. and its Properties
+
+What is target? Executable is a target. Library is a target. *But source files are properties.*
 
 ```cmake
-find_package(ExtMod)
+add_executable(main helloworld.cpp)
+target_link_libraries(main PRIVATE Foo)
+target_compile_definitions(main PUBLIC Bar)
+```
 
-target_include_directories(Main PRIVATE ${ExtMod_INCLUDE_DIRS})
-target_link_libraries(Main PRIVATE ${ExtMod_BOTH_LIBS})
+As you can see from the above example, `main` is the target
+
+
+
+#### Target's properties
+
+**INTERFACE**  does not build the target, it provides the target to the user of the target
+
+Consider it as an *external* implementation
+
+  ```cmake
+target_compile_definitions(main INTERFACE Foo)
+  ```
+
+From the above example, the preprocessor definition `Foo` is defined in all targets e.g. `main` that 			depends on `Foo` but not in `Foo` itself.
+
+:exclamation:  That means `Foo` has become a mere *INTERFACE* as the property declared it as
+
+
+
+**PRIVATE** will build target to itself - and not passed them 
+
+Consider it as an *internal* implementation
+
+```cmake
+target_include_directories(main PRIVATE Bar)
+```
+
+  causes the directory `Bar` to be searched for include files only by `main`
+
+:exclamation: Similar to OOP, private makes the access exclusive to the target
+
+
+
+**PUBLIC** is *both* interface and private
+
+It has both property's properties
+
+```cmake
+target_include_directories(main PUBLIC Bar)
+```
+
+causes directory `Bar` to be searched for include files by `main` and in all targets depending on it via target_link_libraries
+
+:exclamation: Bar is built (*not as interface only*) and is made available for access 
+
+
+
+
+
+## Examples
+
+##### Including a Library in project
+
+If library is installed to a system directory e.g. usr/local, there will not be a need to do `target_include_directories`
+
+When a library is done *right* - 
+
+* .cmake file to make the library available *or*
+* installed to a known location e.g. usr/local or within project directory
+
+the library should be easily link with the following lines
+
+```cmake
+find_package(Foo)
+target_link_libraries(main PRIVATE Foo)
 ```
 
 
 
-##### Third Part Dependencies - FindFoo.cmake - not built with cmake
+##### Third Part Dependencies - FindFoo.cmake 
+
+This part is work in progress still :x:
 
 ```cmake
 find_path(Foo_INCLUDE_DIR foo.h)
@@ -68,17 +122,34 @@ if(Foo_FOUND AND NOT TARFET Foo::Foo)
 endif()
 ```
 
-------
 
 
 
-### Install vs Build
 
-Using application from build/install directory decide whether there is a need to install
+## Install vs Build
 
-INSTALL is used to implement 'make install'. If the software is used from source build, install can be ignored. However in a deployment perspective, installation will be preferred. By installing component into a well-known prefix (e.g. /usr, /opt), it is available system-wide. 
+`INSTALL` is used to implement `$ make install`.  Using application from build/install directory *decides* whether there is a need to install.
 
-If a project is built, install should generate exports - so user do no need to find module, and will be built like part of the project that uses the targets
+If the software is used from source build, install can be ignored. 
+
+```
+$ cd project/build
+$ ./main
+```
+
+... How running an application from source build is like.
+
+
+
+However in a deployment perspective, installation will be preferred. By installing component into a well-known prefix (e.g. /usr, /opt), it is available system-wide.
+
+```
+$ main
+```
+
+ 
+
+If a project is built, install should generate <u>exports</u> - so user do no need to find module, and will be built like part of the project that uses the targets
 
 
 
@@ -86,11 +157,11 @@ If a project is built, install should generate exports - so user do no need to f
 
 Export command creates a build-directory for exported target files. 
 
-EXPORT(..) vs INSTALL(EXPORT ..)
+`EXPORT(..)` vs `INSTALL(EXPORT ..)`
 
-* EXPORT(..) for build trees
+* use EXPORT(..) for build trees
 
-* INSTALL(EXPORT ..) for install trees
+* use INSTALL(EXPORT ..) for install trees
 
   
 
@@ -98,10 +169,10 @@ EXPORT(..) vs INSTALL(EXPORT ..)
 
 The INSTALL command can install targets, files, exports, directories
 
-ARCHIVE - Static Library
-LIBRARY - non-DLL platform shared library
-RUNTIME - Executables
-FRAMEWORK - OS-X shared library
+`ARCHIVE` - Static Library
+`LIBRARY` - non-DLL platform shared library
+`RUNTIME` - Executables
+`FRAMEWORK` - OS-X shared library
 
 ```
 install(TARGETS targets 
@@ -127,8 +198,6 @@ target_include_directories(target
 
 
 
-------
-
 
 
 ### Random Stuff
@@ -136,11 +205,9 @@ target_include_directories(target
 - Don't use file(GLOB), cannot detect file changes well
 - Don't use include_directories, use target_include_directories (but not with a path outside module)
 
-------
 
 
-
-### Reads
+## Reads
 
 Daniel Pfeifer's Effective CMake [Link](https://www.youtube.com/watch?v=bsXLMQ6WgIk)
 
